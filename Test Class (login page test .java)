@@ -1,0 +1,51 @@
+package tests;
+
+import base.BaseTest;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import pages.LoginPage;
+
+public class LoginPageTest extends BaseTest {
+
+    @Test
+    public void testLoginButtonDisabledWhenFieldsAreEmpty() {
+        LoginPage login = new LoginPage(driver);
+        Assert.assertFalse(login.isLoginButtonEnabled(), "Login button should be disabled");
+    }
+
+    @Test
+    public void testInvalidLoginShowErrorMessage() {
+        LoginPage login = new LoginPage(driver);
+        login.enterUserId("invalid_user");
+        login.enterPassword("wrong_pass");
+        login.clickLogin();
+
+        String error = login.getErrorMessage();
+        System.out.println("Error message: " + error);
+
+        Assert.assertTrue(error.toLowerCase().contains("invalid") || !error.isEmpty(),
+                "Error message should be shown on invalid login");
+    }
+
+    @Test
+    public void testPasswordMaskedButton() {
+        LoginPage login = new LoginPage(driver);
+
+        login.enterPassword("testpass");
+        Assert.assertEquals(login.getPasswordFieldType(), "password", "Password should be masked");
+
+        login.clickPasswordToggle();
+        Assert.assertEquals(login.getPasswordFieldType(), "text", "Password should be visible after toggle");
+
+        login.clickPasswordToggle();
+        Assert.assertEquals(login.getPasswordFieldType(), "password", "Password should be masked again");
+    }
+
+    @Test
+    public void testLoginPageUIElementsPresence() {
+        LoginPage login = new LoginPage(driver);
+        Assert.assertTrue(login.isUserIdFieldDisplayed(), "User ID field not displayed");
+        Assert.assertTrue(login.isPasswordFieldDisplayed(), "Password field not displayed");
+        Assert.assertTrue(login.isLoginButtonDisplayed(), "Login button not displayed");
+    }
+}
